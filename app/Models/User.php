@@ -21,7 +21,11 @@ class User extends Authenticatable
         'address',
         'city',
         'country',
-        'is_active'
+        'is_active',
+        'shop_info',
+        'is_validated',
+        'validated_at',
+        'validated_by'
     ];
 
     protected $hidden = [
@@ -32,7 +36,10 @@ class User extends Authenticatable
     protected $casts = [
         'email_verified_at' => 'datetime',
         'is_active' => 'boolean',
-        'password' => 'hashed'
+        'is_validated' => 'boolean',
+        'validated_at' => 'datetime',
+        'password' => 'hashed',
+        'shop_info' => 'array'
     ];
 
     // Relations

@@ -91,7 +91,7 @@ class UserSeeder extends Seeder
                 'is_validated' => true,
                 'validated_at' => now(),
                 'validated_by' => 1, // Admin
-                'shop_info' => $vendeur['shop_info'],
+                'shop_info' => $vendeur['shop_info']
                 'email_verified_at' => now()
             ]);
         }
