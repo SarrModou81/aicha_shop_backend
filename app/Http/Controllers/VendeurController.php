@@ -7,9 +7,13 @@ use App\Models\Category;
 use App\Models\Marque;
 use App\Models\Stock;
 use App\Models\Commande;
+use App\Models\DetailCommande;
+use App\Models\Notification;
+use App\Models\Report;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\DB;
 
 class VendeurController extends Controller
 {
@@ -435,6 +439,353 @@ class VendeurController extends Controller
         return response()->json([
             'user' => $user,
             'message' => 'Informations boutique mises à jour'
+        ]);
+    }
+
+    // ========== FONCTIONNALITÉS AVANCÉES ==========
+
+    /**
+     * Masquer/Activer produit
+     */
+    public function toggleProductVisibility(Request $request, $id)
+    {
+        $produit = Produit::where('vendeur_id', $request->user()->id)
+            ->where('id', $id)
+            ->firstOrFail();
+
+        $produit->is_active = !$produit->is_active;
+        $produit->save();
+
+        $status = $produit->is_active ? 'activé' : 'masqué';
+
+        return response()->json([
+            'produit' => $produit,
+            'message' => "Produit $status avec succès"
+        ]);
+    }
+
+    /**
+     * Analyser les performances d'un produit spécifique
+     */
+    public function analyzeProduct(Request $request, $produitId)
+    {
+        $produit = Produit::where('vendeur_id', $request->user()->id)
+            ->where('id', $produitId)
+            ->with(['category', 'marque', 'stock'])
+            ->withCount('avis')
+            ->withAvg('avis', 'rating')
+            ->firstOrFail();
+
+        // Statistiques de ventes
+        $sales = DetailCommande::where('produit_id', $produitId)
+            ->whereHas('commande', function($query) {
+                $query->where('status', '!=', 'annulee');
+            })
+            ->selectRaw('
+                COUNT(*) as total_orders,
+                SUM(quantity) as total_sold,
+                SUM(total) as total_revenue
+            ')
+            ->first();
+
+        // Ventes par mois (derniers 12 mois)
+        $salesByMonth = DetailCommande::where('produit_id', $produitId)
+            ->whereHas('commande', function($query) {
+                $query->where('status', '!=', 'annulee');
+            })
+            ->selectRaw('
+                DATE_FORMAT(detail_commandes.created_at, "%Y-%m") as month,
+                SUM(quantity) as quantity,
+                SUM(total) as revenue
+            ')
+            ->where('detail_commandes.created_at', '>=', now()->subMonths(12))
+            ->groupBy('month')
+            ->orderBy('month')
+            ->get();
+
+        // Taux de conversion (vues vs achats)
+        $conversionRate = $produit->views > 0
+            ? ($sales->total_orders / $produit->views) * 100
+            : 0;
+
+        return response()->json([
+            'produit' => $produit,
+            'sales' => $sales,
+            'sales_by_month' => $salesByMonth,
+            'conversion_rate' => round($conversionRate, 2)
+        ]);
+    }
+
+    /**
+     * Générer un rapport de ventes
+     */
+    public function generateReport(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'type' => 'required|in:sales,products,inventory',
+            'date_from' => 'required|date',
+            'date_to' => 'required|date|after_or_equal:date_from',
+            'format' => 'required|in:pdf,excel,csv'
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json($validator->errors(), 400);
+        }
+
+        $vendeurId = $request->user()->id;
+
+        // Créer le rapport
+        $report = Report::create([
+            'user_id' => $vendeurId,
+            'type' => $request->type,
+            'title' => "Rapport " . $request->type . " - " . now()->format('Y-m-d'),
+            'description' => "Rapport généré pour la période du {$request->date_from} au {$request->date_to}",
+            'date_from' => $request->date_from,
+            'date_to' => $request->date_to,
+            'format' => $request->format,
+            'filters' => $request->only(['type', 'date_from', 'date_to']),
+            'status' => 'en_cours'
+        ]);
+
+        // Générer le rapport en arrière-plan
+        // TODO: Utiliser une queue Laravel pour générer le rapport de manière asynchrone
+
+        try {
+            $data = $this->prepareReportData($vendeurId, $request->type, $request->date_from, $request->date_to);
+
+            // Générer le fichier selon le format
+            $fileName = "report_{$report->id}." . ($request->format === 'excel' ? 'xlsx' : $request->format);
+            $filePath = "reports/{$fileName}";
+
+            // TODO: Implémenter la génération de fichiers PDF/Excel/CSV
+            // Pour l'instant, on simule la génération
+            Storage::put($filePath, json_encode($data, JSON_PRETTY_PRINT));
+
+            $report->file_path = $filePath;
+            $report->status = 'termine';
+            $report->save();
+
+            // Notification
+            Notification::create([
+                'user_id' => $vendeurId,
+                'type' => 'report_ready',
+                'message' => "Votre rapport est prêt à être téléchargé"
+            ]);
+
+            return response()->json([
+                'report' => $report,
+                'message' => 'Rapport généré avec succès'
+            ]);
+        } catch (\Exception $e) {
+            $report->status = 'erreur';
+            $report->save();
+
+            return response()->json([
+                'message' => 'Erreur lors de la génération du rapport: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+
+    /**
+     * Préparer les données pour le rapport
+     */
+    protected function prepareReportData($vendeurId, $type, $dateFrom, $dateTo)
+    {
+        switch ($type) {
+            case 'sales':
+                return Commande::whereHas('details.produit', function($query) use ($vendeurId) {
+                    $query->where('vendeur_id', $vendeurId);
+                })
+                ->whereBetween('created_at', [$dateFrom, $dateTo])
+                ->with(['details' => function($query) use ($vendeurId) {
+                    $query->whereHas('produit', function($q) use ($vendeurId) {
+                        $q->where('vendeur_id', $vendeurId);
+                    });
+                }, 'user', 'paiement'])
+                ->get();
+
+            case 'products':
+                return Produit::where('vendeur_id', $vendeurId)
+                    ->with(['category', 'marque', 'stock'])
+                    ->withCount(['detailCommandes' => function($query) use ($dateFrom, $dateTo) {
+                        $query->whereBetween('created_at', [$dateFrom, $dateTo]);
+                    }])
+                    ->get();
+
+            case 'inventory':
+                return Produit::where('vendeur_id', $vendeurId)
+                    ->with(['stock', 'category'])
+                    ->get();
+
+            default:
+                return [];
+        }
+    }
+
+    /**
+     * Télécharger un rapport
+     */
+    public function downloadReport($reportId)
+    {
+        $report = Report::where('user_id', auth()->id())
+            ->where('id', $reportId)
+            ->firstOrFail();
+
+        if ($report->status !== 'termine' || !$report->file_path) {
+            return response()->json(['message' => 'Rapport non disponible'], 400);
+        }
+
+        if (!Storage::exists($report->file_path)) {
+            return response()->json(['message' => 'Fichier non trouvé'], 404);
+        }
+
+        return Storage::download($report->file_path);
+    }
+
+    /**
+     * Liste des rapports
+     */
+    public function getReports(Request $request)
+    {
+        $reports = Report::where('user_id', $request->user()->id)
+            ->orderBy('created_at', 'desc')
+            ->paginate(20);
+
+        return response()->json($reports);
+    }
+
+    /**
+     * Import CSV complet pour les stocks
+     */
+    public function importStockCSV(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'csv_file' => 'required|file|mimes:csv,txt'
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json($validator->errors(), 400);
+        }
+
+        $vendeurId = $request->user()->id;
+        $file = $request->file('csv_file');
+
+        try {
+            $csvData = array_map('str_getcsv', file($file->getRealPath()));
+            $header = array_shift($csvData); // Première ligne = en-têtes
+
+            // Vérifier les en-têtes requis
+            $requiredHeaders = ['product_id', 'quantity'];
+            $missingHeaders = array_diff($requiredHeaders, $header);
+
+            if (!empty($missingHeaders)) {
+                return response()->json([
+                    'message' => 'En-têtes manquants: ' . implode(', ', $missingHeaders)
+                ], 400);
+            }
+
+            $results = [
+                'success' => 0,
+                'errors' => [],
+                'total' => count($csvData)
+            ];
+
+            foreach ($csvData as $index => $row) {
+                $rowData = array_combine($header, $row);
+                $lineNumber = $index + 2; // +2 car index commence à 0 et on a enlevé l'en-tête
+
+                try {
+                    // Vérifier que le produit appartient au vendeur
+                    $produit = Produit::where('id', $rowData['product_id'])
+                        ->where('vendeur_id', $vendeurId)
+                        ->first();
+
+                    if (!$produit) {
+                        $results['errors'][] = "Ligne $lineNumber: Produit non trouvé ou non autorisé";
+                        continue;
+                    }
+
+                    // Mettre à jour le stock
+                    $stock = Stock::where('produit_id', $produit->id)->first();
+
+                    if ($stock) {
+                        $stock->quantity = $rowData['quantity'];
+                        if (isset($rowData['low_stock_threshold'])) {
+                            $stock->low_stock_threshold = $rowData['low_stock_threshold'];
+                        }
+                        $stock->save();
+                    } else {
+                        Stock::create([
+                            'produit_id' => $produit->id,
+                            'quantity' => $rowData['quantity'],
+                            'low_stock_threshold' => $rowData['low_stock_threshold'] ?? 10
+                        ]);
+                    }
+
+                    $results['success']++;
+                } catch (\Exception $e) {
+                    $results['errors'][] = "Ligne $lineNumber: " . $e->getMessage();
+                }
+            }
+
+            return response()->json([
+                'message' => "Import terminé: {$results['success']} succès sur {$results['total']}",
+                'results' => $results
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'message' => 'Erreur lors de l\'import: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+
+    /**
+     * Annuler une commande (vendeur peut annuler avec raison)
+     */
+    public function cancelOrder(Request $request, $orderId)
+    {
+        $validator = Validator::make($request->all(), [
+            'reason' => 'required|string|max:500'
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json($validator->errors(), 400);
+        }
+
+        $order = Commande::whereHas('details.produit', function($query) {
+            $query->where('vendeur_id', auth()->id());
+        })->findOrFail($orderId);
+
+        if ($order->status === 'annulee') {
+            return response()->json(['message' => 'Commande déjà annulée'], 400);
+        }
+
+        if (in_array($order->status, ['expediee', 'livree'])) {
+            return response()->json(['message' => 'Commande déjà expédiée ou livrée'], 400);
+        }
+
+        $order->status = 'annulee';
+        $order->notes = ($order->notes ?? '') . "\nAnnulée par le vendeur: " . $request->reason;
+        $order->save();
+
+        // Restaurer le stock
+        foreach ($order->details as $detail) {
+            $stock = Stock::where('produit_id', $detail->produit_id)->first();
+            if ($stock) {
+                $stock->increment('quantity', $detail->quantity);
+            }
+        }
+
+        // Notification au client
+        Notification::create([
+            'user_id' => $order->user_id,
+            'type' => 'order_cancelled',
+            'message' => "Votre commande #{$order->order_number} a été annulée. Raison: {$request->reason}"
+        ]);
+
+        return response()->json([
+            'message' => 'Commande annulée avec succès',
+            'order' => $order
         ]);
     }
 }
