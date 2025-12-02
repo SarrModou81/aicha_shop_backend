@@ -22,7 +22,7 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Artisan;
 
-class AdminControllerEnriched extends Controller
+class AdminController extends Controller
 {
     // ========== GESTION UTILISATEURS ==========
 

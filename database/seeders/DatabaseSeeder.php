@@ -1,42 +1,42 @@
 <?php
-// database/seeders/DatabaseSeeder.php
+
 namespace Database\Seeders;
 
-use App\Models\Category;
 use Illuminate\Database\Seeder;
-use App\Models\User;
-use App\Models\Marque;
 
 class DatabaseSeeder extends Seeder
 {
-// database/seeders/DatabaseSeeder.php
-    public function run()
+    /**
+     * Seed the application's database.
+     */
+    public function run(): void
     {
-        // Créer admin
-        User::create([
-            'name' => 'Admin Aicha',
-            'email' => 'admin@aicha.sn',
-            'password' => bcrypt('password'),
-            'role' => 'admin',
-            'phone' => '+221771234567',
-            'address' => 'Parcelles Assainies Unité 16',
-            'city' => 'Dakar'
+        $this->command->info('🌱 Démarrage du seeding de la base de données...');
+        $this->command->newLine();
+
+        $this->call([
+            UserSeeder::class,
+            CategorySeeder::class,
+            MarqueSeeder::class,
+            DeliveryZoneSeeder::class,
+            SystemSettingSeeder::class,
+            ProduitSeeder::class,
+            // CommandeSeeder::class, // Décommenter si vous voulez des commandes de test
         ]);
 
-        // Créer catégories
-        $categories = [
-            ['name' => 'Vêtements Femmes'],
-            ['name' => 'Vêtements Hommes'],
-            ['name' => 'Enfants'],
-            ['name' => 'Chaussures'],
-            ['name' => 'Sacs'],
-            ['name' => 'Accessoires']
-        ];
-
-        foreach ($categories as $category) {
-            Category::create([
-                'name' => $category['name'],
-                'slug' => \Str::slug($category['name'])
-            ]);
-        }
-    }}
+        $this->command->newLine();
+        $this->command->info('🎉 Base de données peuplée avec succès !');
+        $this->command->newLine();
+        $this->command->info('📧 Identifiants Admin:');
+        $this->command->info('   Email: admin@aichashop.sn');
+        $this->command->info('   Password: admin123');
+        $this->command->newLine();
+        $this->command->info('📧 Identifiants Vendeurs:');
+        $this->command->info('   Email: fatou@aichashop.sn, mamadou@aichashop.sn, etc.');
+        $this->command->info('   Password: vendeur123');
+        $this->command->newLine();
+        $this->command->info('📧 Identifiants Clients:');
+        $this->command->info('   Email: khady@example.com, moussa@example.com, etc.');
+        $this->command->info('   Password: client123');
+    }
+}
