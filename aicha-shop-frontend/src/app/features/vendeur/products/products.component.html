@@ -1,50 +1,139 @@
 <div class="vendeur-products-page">
-  <div class="container">
-    <div class="page-header">
-      <h1>Mes Produits</h1>
-      <button routerLink="/vendeur/products/add" class="btn btn-primary">Ajouter un produit</button>
-    </div>
+  <div class="page-header">
+    <h1>Mes Produits</h1>
+    <button (click)="showForm = !showForm" class="btn btn-primary">
+      {{ showForm ? '✕ Annuler' : '+ Ajouter un produit' }}
+    </button>
+  </div>
 
-    <div *ngIf="loading" class="loading-container">
-      <div class="spinner"></div>
-    </div>
+  <!-- Product Form -->
+  <div *ngIf="showForm" class="product-form-card">
+    <h2>{{ editingProduct ? 'Modifier le produit' : 'Nouveau produit' }}</h2>
+    <form #productForm="ngForm" (ngSubmit)="saveProduct(productForm)">
+      <div class="form-grid">
+        <div class="form-group">
+          <label class="form-label">Nom du produit *</label>
+          <input type="text" name="name" [(ngModel)]="formData.name" required class="form-control" placeholder="Ex: iPhone 14 Pro">
+        </div>
 
-    <div *ngIf="!loading && products.length === 0" class="empty-state">
-      <p>Aucun produit. Ajoutez votre premier produit!</p>
-    </div>
+        <div class="form-group">
+          <label class="form-label">Prix (FCFA) *</label>
+          <input type="number" name="price" [(ngModel)]="formData.price" required min="0" class="form-control" placeholder="150000">
+        </div>
 
-    <div *ngIf="!loading && products.length > 0" class="products-table">
-      <table>
-        <thead>
-          <tr>
-            <th>Image</th>
-            <th>Nom</th>
-            <th>Prix</th>
-            <th>Stock</th>
-            <th>Statut</th>
-            <th>Actions</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr *ngFor="let product of products">
-            <td><img [src]="product.images?.[0] || 'assets/placeholder.jpg'" class="product-thumb"></td>
-            <td>{{ product.name }}</td>
-            <td>{{ product.price | number:'1.0-0' }} FCFA</td>
-            <td>{{ product.stock?.quantity || 0 }}</td>
-            <td>
-              <span class="badge" [ngClass]="product.is_active ? 'badge-success' : 'badge-error'">
-                {{ product.is_active ? 'Actif' : 'Inactif' }}
-              </span>
-            </td>
-            <td>
-              <button (click)="toggleProductVisibility(product)" class="btn btn-sm btn-outline">
-                {{ product.is_active ? 'Désactiver' : 'Activer' }}
-              </button>
-              <button (click)="deleteProduct(product)" class="btn btn-sm btn-outline">Supprimer</button>
-            </td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
+        <div class="form-group">
+          <label class="form-label">Catégorie *</label>
+          <select name="category_id" [(ngModel)]="formData.category_id" required class="form-control">
+            <option value="">Sélectionnez une catégorie</option>
+            <option *ngFor="let cat of categories" [value]="cat.id">{{ cat.name }}</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Marque *</label>
+          <select name="marque_id" [(ngModel)]="formData.marque_id" required class="form-control">
+            <option value="">Sélectionnez une marque</option>
+            <option *ngFor="let marque of marques" [value]="marque.id">{{ marque.name }}</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Quantité en stock *</label>
+          <input type="number" name="quantity" [(ngModel)]="formData.quantity" required min="0" class="form-control" placeholder="50">
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Seuil d'alerte</label>
+          <input type="number" name="low_stock_threshold" [(ngModel)]="formData.low_stock_threshold" min="0" class="form-control" placeholder="10">
+        </div>
+
+        <div class="form-group full-width">
+          <label class="form-label">Description *</label>
+          <textarea name="description" [(ngModel)]="formData.description" required rows="4" class="form-control" placeholder="Description détaillée du produit..."></textarea>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Prix comparatif</label>
+          <input type="number" name="compare_price" [(ngModel)]="formData.compare_price" min="0" class="form-control" placeholder="200000">
+        </div>
+
+        <div class="form-group checkbox-group full-width">
+          <label class="checkbox-label">
+            <input type="checkbox" name="is_featured" [(ngModel)]="formData.is_featured">
+            <span>Produit en vedette</span>
+          </label>
+        </div>
+      </div>
+
+      <div class="form-actions">
+        <button type="button" (click)="cancelForm()" class="btn btn-outline">Annuler</button>
+        <button type="submit" [disabled]="!productForm.valid" class="btn btn-primary">
+          {{ editingProduct ? 'Mettre à jour' : 'Créer le produit' }}
+        </button>
+      </div>
+    </form>
+  </div>
+
+  <!-- Loading -->
+  <div *ngIf="loading" class="loading-container">
+    <div class="spinner"></div>
+    <p>Chargement...</p>
+  </div>
+
+  <!-- Empty State -->
+  <div *ngIf="!loading && products.length === 0 && !showForm" class="empty-state">
+    <div class="empty-icon">📦</div>
+    <h3>Aucun produit</h3>
+    <p>Commencez par ajouter votre premier produit !</p>
+    <button (click)="showForm = true" class="btn btn-primary btn-lg">+ Ajouter un produit</button>
+  </div>
+
+  <!-- Products Table -->
+  <div *ngIf="!loading && products.length > 0" class="products-table">
+    <table>
+      <thead>
+        <tr>
+          <th>Image</th>
+          <th>Nom</th>
+          <th>Prix</th>
+          <th>Stock</th>
+          <th>Catégorie</th>
+          <th>Statut</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let product of products">
+          <td>
+            <img [src]="product.images?.[0] || 'assets/images/placeholder.jpg'"
+                 [alt]="product.name"
+                 class="product-thumb">
+          </td>
+          <td>
+            <div class="product-name">{{ product.name }}</div>
+            <div class="product-ref" *ngIf="product.reference">Réf: {{ product.reference }}</div>
+          </td>
+          <td class="price-cell">{{ product.price | number:'1.0-0' }} FCFA</td>
+          <td>
+            <span class="stock-badge" [ngClass]="{'low-stock': product.stock?.quantity <= (product.stock?.low_stock_threshold || 10)}">
+              {{ product.stock?.quantity || 0 }}
+            </span>
+          </td>
+          <td>{{ product.category?.name || '-' }}</td>
+          <td>
+            <span class="badge" [ngClass]="product.is_active ? 'badge-success' : 'badge-error'">
+              {{ product.is_active ? 'Actif' : 'Inactif' }}
+            </span>
+          </td>
+          <td class="actions-cell">
+            <button (click)="editProduct(product)" class="btn btn-sm btn-icon" title="Modifier">✏️</button>
+            <button (click)="toggleProductVisibility(product)" class="btn btn-sm btn-icon" [title]="product.is_active ? 'Désactiver' : 'Activer'">
+              {{ product.is_active ? '👁️' : '🚫' }}
+            </button>
+            <button (click)="deleteProduct(product)" class="btn btn-sm btn-icon btn-danger" title="Supprimer">🗑️</button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
   </div>
 </div>
