@@ -1,5 +1,120 @@
-<div class="container">
-  <h1>Gestion des Commandes</h1>
-  <p>Page de gestion des commandes vendeur - En construction</p>
-  <p>Fonctionnalités: Liste des commandes, changement de statut, détails</p>
+<div class="orders-page">
+  <div class="page-header">
+    <h1>Gestion des Commandes</h1>
+  </div>
+
+  <!-- Loading -->
+  <div *ngIf="loading" class="loading-container">
+    <div class="spinner"></div>
+    <p>Chargement des commandes...</p>
+  </div>
+
+  <!-- Empty State -->
+  <div *ngIf="!loading && orders.length === 0" class="empty-state">
+    <div class="empty-icon">📦</div>
+    <h3>Aucune commande</h3>
+    <p>Vous n'avez pas encore de commandes.</p>
+  </div>
+
+  <!-- Orders Table -->
+  <div *ngIf="!loading && orders.length > 0" class="orders-table">
+    <table>
+      <thead>
+        <tr>
+          <th>N° Commande</th>
+          <th>Client</th>
+          <th>Date</th>
+          <th>Montant</th>
+          <th>Paiement</th>
+          <th>Statut</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let order of orders">
+          <td>
+            <span class="order-number">#{{ order.order_number }}</span>
+          </td>
+          <td>
+            <div class="client-info">
+              <div class="client-name">{{ order.client?.name }}</div>
+              <div class="client-email">{{ order.client?.email }}</div>
+            </div>
+          </td>
+          <td>{{ order.created_at | date:'dd/MM/yyyy HH:mm' }}</td>
+          <td class="price-cell">{{ order.total | number:'1.0-0' }} FCFA</td>
+          <td>
+            <span class="badge badge-info">{{ order.payment_status || 'Pending' }}</span>
+          </td>
+          <td>
+            <select
+              [(ngModel)]="order.status"
+              (change)="changeOrderStatus(order, order.status)"
+              class="status-select"
+              [ngClass]="'status-' + getStatusColor(order.status)">
+              <option *ngFor="let opt of statusOptions" [value]="opt.value">
+                {{ opt.label }}
+              </option>
+            </select>
+          </td>
+          <td class="actions-cell">
+            <button (click)="viewOrderDetails(order)" class="btn btn-sm btn-icon" title="Voir détails">👁️</button>
+            <button *ngIf="order.status !== 'cancelled' && order.status !== 'delivered'"
+                    (click)="cancelOrder(order)"
+                    class="btn btn-sm btn-icon btn-danger"
+                    title="Annuler">❌</button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Order Details Modal -->
+  <div *ngIf="selectedOrder" class="modal-overlay" (click)="closeModal()">
+    <div class="modal-content" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h2>Détails de la commande #{{ selectedOrder.order_number }}</h2>
+        <button (click)="closeModal()" class="btn-close">✕</button>
+      </div>
+
+      <div class="modal-body">
+        <div class="order-info-grid">
+          <div class="info-item">
+            <label>Client:</label>
+            <span>{{ selectedOrder.client?.name }}</span>
+          </div>
+          <div class="info-item">
+            <label>Email:</label>
+            <span>{{ selectedOrder.client?.email }}</span>
+          </div>
+          <div class="info-item">
+            <label>Date:</label>
+            <span>{{ selectedOrder.created_at | date:'dd/MM/yyyy HH:mm' }}</span>
+          </div>
+          <div class="info-item">
+            <label>Statut:</label>
+            <span class="badge" [ngClass]="'badge-' + getStatusColor(selectedOrder.status)">
+              {{ getStatusLabel(selectedOrder.status) }}
+            </span>
+          </div>
+        </div>
+
+        <h3>Articles</h3>
+        <div class="order-items">
+          <div *ngFor="let item of selectedOrder.items" class="order-item">
+            <div class="item-info">
+              <strong>{{ item.product_name }}</strong>
+              <span class="item-quantity">Qté: {{ item.quantity }}</span>
+            </div>
+            <div class="item-price">{{ item.price * item.quantity | number:'1.0-0' }} FCFA</div>
+          </div>
+        </div>
+
+        <div class="order-total">
+          <strong>Total:</strong>
+          <strong class="total-amount">{{ selectedOrder.total | number:'1.0-0' }} FCFA</strong>
+        </div>
+      </div>
+    </div>
+  </div>
 </div>

@@ -1,5 +1,101 @@
-<div class="container">
-  <h1>Statistiques de Ventes</h1>
-  <p>Page statistiques vendeur - En construction</p>
-  <p>Fonctionnalités: Graphiques de ventes, produits populaires, rapports</p>
+<div class="stats-page">
+  <div class="page-header">
+    <h1>📊 Statistiques de Ventes</h1>
+    <div class="period-selector">
+      <button
+        *ngFor="let period of periods"
+        (click)="changePeriod(period.value)"
+        [class.active]="selectedPeriod === period.value"
+        class="period-btn">
+        {{ period.label }}
+      </button>
+    </div>
+  </div>
+
+  <!-- Loading -->
+  <div *ngIf="loading" class="loading-container">
+    <div class="spinner"></div>
+    <p>Chargement des statistiques...</p>
+  </div>
+
+  <!-- Empty State -->
+  <div *ngIf="!loading && !stats" class="empty-state">
+    <div class="empty-icon">📈</div>
+    <h3>Aucune donnée</h3>
+    <p>Les statistiques ne sont pas encore disponibles</p>
+  </div>
+
+  <!-- Stats Content -->
+  <div *ngIf="!loading && stats" class="stats-content">
+    <!-- Summary Cards -->
+    <div class="summary-cards">
+      <div class="stat-card total-sales">
+        <div class="card-icon">💰</div>
+        <div class="card-info">
+          <div class="card-label">Ventes Totales</div>
+          <div class="card-value">{{ stats.total_sales | number:'1.0-0' }} FCFA</div>
+        </div>
+      </div>
+
+      <div class="stat-card total-orders">
+        <div class="card-icon">📦</div>
+        <div class="card-info">
+          <div class="card-label">Commandes</div>
+          <div class="card-value">{{ stats.total_orders }}</div>
+        </div>
+      </div>
+
+      <div class="stat-card average-order">
+        <div class="card-icon">📊</div>
+        <div class="card-info">
+          <div class="card-label">Panier Moyen</div>
+          <div class="card-value">{{ stats.average_order | number:'1.0-0' }} FCFA</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Sales Chart -->
+    <div class="chart-section">
+      <h2>📈 Évolution des Ventes</h2>
+      <div *ngIf="stats.sales_by_period && stats.sales_by_period.length > 0" class="sales-chart">
+        <div *ngFor="let sale of stats.sales_by_period" class="chart-bar">
+          <div class="bar-container">
+            <div
+              class="bar"
+              [style.height.%]="getBarHeight(sale.amount)"
+              [title]="sale.amount + ' FCFA'">
+            </div>
+          </div>
+          <div class="bar-label">{{ formatDate(sale.date) }}</div>
+          <div class="bar-value">{{ sale.amount | number:'1.0-0' }}</div>
+        </div>
+      </div>
+      <div *ngIf="!stats.sales_by_period || stats.sales_by_period.length === 0" class="no-data">
+        <p>Aucune vente pour cette période</p>
+      </div>
+    </div>
+
+    <!-- Top Products -->
+    <div class="top-products-section">
+      <h2>🏆 Produits les Plus Vendus</h2>
+      <div *ngIf="stats.top_products && stats.top_products.length > 0" class="top-products-list">
+        <div *ngFor="let product of stats.top_products; let i = index" class="product-item">
+          <div class="product-rank">{{ i + 1 }}</div>
+          <div class="product-info">
+            <div class="product-name">{{ product.name }}</div>
+            <div class="product-sales">{{ product.sales }} ventes</div>
+          </div>
+          <div class="product-progress">
+            <div
+              class="progress-bar"
+              [style.width.%]="(product.sales / stats.top_products[0].sales) * 100">
+            </div>
+          </div>
+        </div>
+      </div>
+      <div *ngIf="!stats.top_products || stats.top_products.length === 0" class="no-data">
+        <p>Aucun produit vendu pour cette période</p>
+      </div>
+    </div>
+  </div>
 </div>

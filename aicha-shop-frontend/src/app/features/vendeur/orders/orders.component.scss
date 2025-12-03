@@ -1,0 +1,427 @@
+.orders-page {
+  min-height: calc(100vh - 150px);
+}
+
+.page-header {
+  margin-bottom: 2.5rem;
+
+  h1 {
+    font-size: 2rem;
+    color: #212121;
+    font-weight: 700;
+    margin: 0;
+  }
+}
+
+.loading-container {
+  text-align: center;
+  padding: 4rem 0;
+
+  .spinner {
+    margin: 0 auto 1rem;
+  }
+
+  p {
+    color: #757575;
+    font-size: 1rem;
+  }
+}
+
+.empty-state {
+  text-align: center;
+  padding: 5rem 2rem;
+  background: white;
+  border-radius: 16px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+
+  .empty-icon {
+    font-size: 5rem;
+    margin-bottom: 1.5rem;
+    opacity: 0.5;
+  }
+
+  h3 {
+    font-size: 1.5rem;
+    color: #212121;
+    margin: 0 0 1rem 0;
+    font-weight: 700;
+  }
+
+  p {
+    color: #757575;
+    font-size: 1.1rem;
+    margin: 0;
+  }
+}
+
+.orders-table {
+  background: white;
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+
+    thead {
+      background: linear-gradient(135deg, #2C3E50 0%, #34495E 100%);
+      color: white;
+
+      tr th {
+        padding: 1.25rem 1.5rem;
+        text-align: left;
+        font-weight: 600;
+        text-transform: uppercase;
+        font-size: 0.85rem;
+        letter-spacing: 0.5px;
+      }
+    }
+
+    tbody {
+      tr {
+        border-bottom: 1px solid #F0F0F0;
+        transition: background 0.2s;
+
+        &:hover {
+          background: #F9FAFB;
+        }
+
+        &:last-child {
+          border-bottom: none;
+        }
+
+        td {
+          padding: 1.25rem 1.5rem;
+          color: #212121;
+          font-size: 0.95rem;
+          vertical-align: middle;
+
+          .order-number {
+            font-weight: 700;
+            color: #2196F3;
+            font-size: 1rem;
+          }
+
+          .client-info {
+            .client-name {
+              font-weight: 600;
+              margin-bottom: 0.25rem;
+            }
+
+            .client-email {
+              font-size: 0.8rem;
+              color: #757575;
+            }
+          }
+
+          &.price-cell {
+            font-weight: 700;
+            color: #4CAF50;
+            font-size: 1rem;
+          }
+
+          .status-select {
+            padding: 0.5rem 1rem;
+            border: 2px solid #E0E0E0;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 0.85rem;
+            cursor: pointer;
+            transition: all 0.3s;
+
+            &.status-warning {
+              border-color: #FF9800;
+              color: #FF9800;
+              background: rgba(255, 152, 0, 0.05);
+            }
+
+            &.status-info {
+              border-color: #2196F3;
+              color: #2196F3;
+              background: rgba(33, 150, 243, 0.05);
+            }
+
+            &.status-primary {
+              border-color: #9C27B0;
+              color: #9C27B0;
+              background: rgba(156, 39, 176, 0.05);
+            }
+
+            &.status-success {
+              border-color: #4CAF50;
+              color: #4CAF50;
+              background: rgba(76, 175, 80, 0.05);
+            }
+
+            &.status-error {
+              border-color: #F44336;
+              color: #F44336;
+              background: rgba(244, 67, 54, 0.05);
+            }
+
+            &:focus {
+              outline: none;
+              box-shadow: 0 0 0 3px rgba(76, 175, 80, 0.1);
+            }
+          }
+
+          .badge {
+            padding: 0.4rem 0.9rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            text-transform: capitalize;
+            display: inline-block;
+
+            &.badge-info {
+              background: rgba(33, 150, 243, 0.1);
+              color: #2196F3;
+            }
+
+            &.badge-warning {
+              background: rgba(255, 152, 0, 0.1);
+              color: #FF9800;
+            }
+
+            &.badge-success {
+              background: rgba(76, 175, 80, 0.1);
+              color: #4CAF50;
+            }
+
+            &.badge-error {
+              background: rgba(244, 67, 54, 0.1);
+              color: #F44336;
+            }
+
+            &.badge-primary {
+              background: rgba(156, 39, 176, 0.1);
+              color: #9C27B0;
+            }
+          }
+
+          &.actions-cell {
+            white-space: nowrap;
+
+            .btn {
+              margin-right: 0.5rem;
+              padding: 0.5rem 0.75rem;
+              font-size: 1.2rem;
+              border-radius: 8px;
+              transition: all 0.3s ease;
+              background: transparent;
+              border: none;
+              cursor: pointer;
+
+              &.btn-icon {
+                &:hover {
+                  transform: scale(1.15);
+                  background: rgba(33, 150, 243, 0.1);
+                }
+              }
+
+              &.btn-danger:hover {
+                background: rgba(244, 67, 54, 0.1);
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
+
+// Modal
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  animation: fadeIn 0.3s;
+}
+
+.modal-content {
+  background: white;
+  border-radius: 16px;
+  width: 90%;
+  max-width: 700px;
+  max-height: 90vh;
+  overflow-y: auto;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+  animation: slideUp 0.3s;
+}
+
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 2rem;
+  border-bottom: 2px solid #F0F0F0;
+
+  h2 {
+    margin: 0;
+    font-size: 1.5rem;
+    color: #212121;
+    font-weight: 700;
+  }
+
+  .btn-close {
+    background: none;
+    border: none;
+    font-size: 2rem;
+    cursor: pointer;
+    color: #757575;
+    transition: all 0.3s;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    &:hover {
+      background: #F5F5F5;
+      color: #212121;
+    }
+  }
+}
+
+.modal-body {
+  padding: 2rem;
+}
+
+.order-info-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1.5rem;
+  margin-bottom: 2rem;
+
+  .info-item {
+    label {
+      display: block;
+      font-weight: 600;
+      color: #757575;
+      margin-bottom: 0.5rem;
+      font-size: 0.85rem;
+      text-transform: uppercase;
+    }
+
+    span {
+      font-size: 1rem;
+      color: #212121;
+    }
+  }
+}
+
+.modal-body h3 {
+  margin: 2rem 0 1rem 0;
+  font-size: 1.25rem;
+  color: #212121;
+  font-weight: 700;
+}
+
+.order-items {
+  background: #F9FAFB;
+  padding: 1.5rem;
+  border-radius: 12px;
+  margin-bottom: 1.5rem;
+}
+
+.order-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem 0;
+  border-bottom: 1px solid #E0E0E0;
+
+  &:last-child {
+    border-bottom: none;
+  }
+
+  .item-info {
+    strong {
+      display: block;
+      margin-bottom: 0.25rem;
+      color: #212121;
+    }
+
+    .item-quantity {
+      font-size: 0.85rem;
+      color: #757575;
+    }
+  }
+
+  .item-price {
+    font-weight: 700;
+    color: #4CAF50;
+    font-size: 1rem;
+  }
+}
+
+.order-total {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1.5rem;
+  background: linear-gradient(135deg, #4CAF50 0%, #66BB6A 100%);
+  color: white;
+  border-radius: 12px;
+  font-size: 1.25rem;
+
+  .total-amount {
+    font-size: 1.5rem;
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(50px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (max-width: 768px) {
+  .orders-table {
+    overflow-x: auto;
+
+    table {
+      min-width: 900px;
+    }
+  }
+
+  .modal-content {
+    width: 95%;
+    max-height: 95vh;
+  }
+
+  .modal-header {
+    padding: 1.5rem;
+  }
+
+  .modal-body {
+    padding: 1.5rem;
+  }
+
+  .order-info-grid {
+    grid-template-columns: 1fr;
+  }
+}
