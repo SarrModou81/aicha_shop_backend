@@ -20,7 +20,9 @@ class Produit extends Model
         'is_featured',
         'is_active',
         'status',
-        'images'
+        'images',
+        'views',
+        'attributes'
     ];
 
     protected $casts = [
@@ -28,7 +30,8 @@ class Produit extends Model
         'compare_price' => 'decimal:2',
         'is_featured' => 'boolean',
         'is_active' => 'boolean',
-        'images' => 'array'
+        'images' => 'array',
+        'attributes' => 'array'
     ];
 
     // Relations
