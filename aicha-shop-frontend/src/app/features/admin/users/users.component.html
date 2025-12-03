@@ -1,4 +1,45 @@
-<div class="container">
-  <h1>Users</h1>
-  <p>Page en construction...</p>
+<div class="admin-users-page">
+  <div class="container">
+    <div class="page-header">
+      <h1>Gestion des Utilisateurs</h1>
+    </div>
+
+    <div *ngIf="loading" class="loading-container">
+      <div class="spinner"></div>
+    </div>
+
+    <div *ngIf="!loading" class="users-table">
+      <table>
+        <thead>
+          <tr>
+            <th>Nom</th>
+            <th>Email</th>
+            <th>Rôle</th>
+            <th>Statut</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let user of users">
+            <td>{{ user.name }}</td>
+            <td>{{ user.email }}</td>
+            <td><span class="badge badge-info">{{ user.role }}</span></td>
+            <td>
+              <span class="badge" [ngClass]="user.is_active ? 'badge-success' : 'badge-error'">
+                {{ user.is_active ? 'Actif' : 'Inactif' }}
+              </span>
+            </td>
+            <td>
+              <button (click)="toggleUserStatus(user)" class="btn btn-sm btn-outline">
+                {{ user.is_active ? 'Désactiver' : 'Activer' }}
+              </button>
+              <button (click)="resetPassword(user)" class="btn btn-sm btn-outline">
+                Réinitialiser MDP
+              </button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
 </div>

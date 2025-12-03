@@ -1,0 +1,141 @@
+.dashboard-page {
+  padding: 2rem 0;
+  min-height: calc(100vh - 200px);
+}
+
+.page-title {
+  text-align: center;
+  margin-bottom: 2rem;
+  color: #212121;
+}
+
+.loading-container {
+  text-align: center;
+  padding: 4rem 0;
+
+  .spinner {
+    margin: 0 auto 1rem;
+  }
+}
+
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 1.5rem;
+  margin-bottom: 3rem;
+}
+
+.stat-card {
+  background: white;
+  padding: 2rem;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  display: flex;
+  gap: 1.5rem;
+  transition: transform 0.2s;
+
+  &:hover {
+    transform: translateY(-5px);
+  }
+
+  .stat-icon {
+    font-size: 3rem;
+  }
+
+  .stat-info {
+    flex: 1;
+
+    h3 {
+      font-size: 0.9rem;
+      color: #757575;
+      margin-bottom: 0.5rem;
+      text-transform: uppercase;
+    }
+
+    .stat-value {
+      font-size: 2rem;
+      font-weight: bold;
+      margin-bottom: 0.25rem;
+      margin: 0;
+    }
+
+    .stat-detail {
+      font-size: 0.85rem;
+      color: #757575;
+    }
+  }
+
+  &.primary {
+    border-left: 4px solid #E91E63;
+    .stat-value { color: #E91E63; }
+  }
+
+  &.success {
+    border-left: 4px solid #4CAF50;
+    .stat-value { color: #4CAF50; }
+  }
+
+  &.warning {
+    border-left: 4px solid #FF9800;
+    .stat-value { color: #FF9800; }
+  }
+
+  &.error {
+    border-left: 4px solid #F44336;
+    .stat-value { color: #F44336; }
+  }
+}
+
+.quick-actions {
+  h2 {
+    margin-bottom: 1.5rem;
+    color: #212121;
+  }
+
+  .actions-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 1.5rem;
+  }
+
+  .action-card {
+    background: white;
+    padding: 2rem;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    text-align: center;
+    transition: all 0.2s;
+    cursor: pointer;
+
+    &:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+    }
+
+    .action-icon {
+      font-size: 3rem;
+      margin-bottom: 1rem;
+    }
+
+    h3 {
+      font-size: 1.25rem;
+      margin-bottom: 0.5rem;
+      color: #212121;
+    }
+
+    p {
+      color: #757575;
+      margin: 0;
+    }
+  }
+}
+
+@media (max-width: 768px) {
+  .stats-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .actions-grid {
+    grid-template-columns: 1fr;
+  }
+}

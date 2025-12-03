@@ -1,1 +1,102 @@
-<p>product-detail works!</p>
+<div class="product-detail-page">
+  <div class="container">
+    <div *ngIf="loading" class="loading-container">
+      <div class="spinner"></div>
+      <p>Chargement du produit...</p>
+    </div>
+
+    <div *ngIf="!loading && product" class="product-detail">
+      <!-- Breadcrumb -->
+      <div class="breadcrumb">
+        <a routerLink="/">Accueil</a> / 
+        <a routerLink="/products">Produits</a> / 
+        <span>{{ product.name }}</span>
+      </div>
+
+      <div class="product-content">
+        <!-- Images Section -->
+        <div class="images-section">
+          <div class="main-image">
+            <img [src]="product.images?.[selectedImage] || 'assets/images/placeholder.jpg'" [alt]="product.name">
+          </div>
+          <div class="thumbnails" *ngIf="product.images && product.images.length > 1">
+            <div 
+              *ngFor="let image of product.images; let i = index"
+              class="thumbnail"
+              [class.active]="selectedImage === i"
+              (click)="selectImage(i)">
+              <img [src]="image" [alt]="product.name">
+            </div>
+          </div>
+        </div>
+
+        <!-- Product Info -->
+        <div class="info-section">
+          <h1>{{ product.name }}</h1>
+          
+          <div class="badges">
+            <span *ngIf="product.is_featured" class="badge badge-primary">Vedette</span>
+            <span *ngIf="product.is_active" class="badge badge-success">Disponible</span>
+          </div>
+
+          <div class="price-section">
+            <span class="current-price">{{ product.price | number:'1.0-0' }} FCFA</span>
+            <span *ngIf="product.compare_price" class="original-price">{{ product.compare_price | number:'1.0-0' }} FCFA</span>
+            <span *ngIf="product.compare_price" class="discount">
+              -{{ ((product.compare_price - product.price) / product.compare_price * 100) | number:'1.0-0' }}%
+            </span>
+          </div>
+
+          <div class="meta-info">
+            <p><strong>Catégorie:</strong> {{ product.category?.name || 'N/A' }}</p>
+            <p><strong>Marque:</strong> {{ product.marque?.name || 'N/A' }}</p>
+            <p *ngIf="product.vendeur"><strong>Vendeur:</strong> {{ product.vendeur.name }}</p>
+            <p *ngIf="product.stock">
+              <strong>Stock:</strong> 
+              <span [class.text-error]="product.stock.quantity < 5">
+                {{ product.stock.quantity }} unité(s) disponible(s)
+              </span>
+            </p>
+          </div>
+
+          <div class="description">
+            <h3>Description</h3>
+            <p>{{ product.description }}</p>
+          </div>
+
+          <div *ngIf="product.attributes && product.attributes.length > 0" class="attributes">
+            <h3>Caractéristiques</h3>
+            <ul>
+              <li *ngFor="let attr of product.attributes">
+                <strong>{{ attr.name }}:</strong> {{ attr.value }}
+              </li>
+            </ul>
+          </div>
+
+          <!-- Actions -->
+          <div class="actions-section" *ngIf="authService.isClient() || !authService.isAuthenticated()">
+            <div class="quantity-selector">
+              <button (click)="decreaseQuantity()" class="btn btn-outline">-</button>
+              <input type="number" [(ngModel)]="quantity" min="1" [max]="product.stock?.quantity || 999" class="quantity-input">
+              <button (click)="increaseQuantity()" class="btn btn-outline">+</button>
+            </div>
+
+            <button 
+              (click)="addToCart()" 
+              [disabled]="product.stock && product.stock.quantity === 0"
+              class="btn btn-outline btn-lg">
+              Ajouter au panier
+            </button>
+
+            <button 
+              (click)="buyNow()" 
+              [disabled]="product.stock && product.stock.quantity === 0"
+              class="btn btn-primary btn-lg">
+              Acheter maintenant
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

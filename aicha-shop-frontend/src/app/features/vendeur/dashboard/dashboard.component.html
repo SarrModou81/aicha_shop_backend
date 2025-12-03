@@ -1,4 +1,75 @@
-<div class="container">
-  <h1>Tableau de Bord Vendeur</h1>
-  <p>Bienvenue sur votre tableau de bord</p>
+<div class="dashboard-page">
+  <div class="container">
+    <h1 class="page-title">Tableau de Bord Vendeur</h1>
+
+    <div *ngIf="loading" class="loading-container">
+      <div class="spinner"></div>
+      <p>Chargement...</p>
+    </div>
+
+    <div *ngIf="!loading && stats" class="dashboard-content">
+      <!-- Stats Cards -->
+      <div class="stats-grid">
+        <div class="stat-card primary">
+          <div class="stat-icon">📦</div>
+          <div class="stat-info">
+            <h3>Produits Totaux</h3>
+            <p class="stat-value">{{ stats.total_products }}</p>
+            <span class="stat-detail">{{ stats.active_products }} actifs</span>
+          </div>
+        </div>
+
+        <div class="stat-card success">
+          <div class="stat-icon">🛍️</div>
+          <div class="stat-info">
+            <h3>Commandes</h3>
+            <p class="stat-value">{{ stats.total_orders }}</p>
+            <span class="stat-detail">{{ stats.pending_orders }} en attente</span>
+          </div>
+        </div>
+
+        <div class="stat-card warning">
+          <div class="stat-icon">💰</div>
+          <div class="stat-info">
+            <h3>Chiffre d'Affaires</h3>
+            <p class="stat-value">{{ stats.total_revenue | number:'1.0-0' }} FCFA</p>
+            <span class="stat-detail">Total des ventes</span>
+          </div>
+        </div>
+
+        <div class="stat-card error">
+          <div class="stat-icon">⚠️</div>
+          <div class="stat-info">
+            <h3>Stock Faible</h3>
+            <p class="stat-value">{{ stats.low_stock_count }}</p>
+            <span class="stat-detail">Produits à réapprovisionner</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Quick Actions -->
+      <div class="quick-actions">
+        <h2>Actions Rapides</h2>
+        <div class="actions-grid">
+          <a routerLink="/vendeur/products" class="action-card">
+            <div class="action-icon">📦</div>
+            <h3>Gérer les Produits</h3>
+            <p>Ajouter, modifier ou supprimer des produits</p>
+          </a>
+
+          <a routerLink="/vendeur/orders" class="action-card">
+            <div class="action-icon">🛍️</div>
+            <h3>Voir les Commandes</h3>
+            <p>Traiter les commandes en attente</p>
+          </a>
+
+          <a routerLink="/vendeur/stats" class="action-card">
+            <div class="action-icon">📊</div>
+            <h3>Statistiques</h3>
+            <p>Analyser vos ventes</p>
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
 </div>

@@ -1,4 +1,118 @@
-<div class="container">
-  <h1>Products</h1>
-  <p>Page en construction...</p>
+<div class="products-page">
+  <div class="container">
+    <h1 class="page-title">Nos Produits</h1>
+
+    <!-- Filters -->
+    <div class="filters-section">
+      <div class="search-box">
+        <input 
+          type="text" 
+          [(ngModel)]="filters.search" 
+          (keyup.enter)="onSearch()"
+          placeholder="Rechercher un produit..." 
+          class="form-control">
+        <button (click)="onSearch()" class="btn btn-primary">Rechercher</button>
+      </div>
+
+      <div class="filters-grid">
+        <div class="filter-group">
+          <label class="form-label">Catégorie</label>
+          <select [(ngModel)]="filters.category_id" (change)="onFilterChange()" class="form-control">
+            <option [ngValue]="undefined">Toutes les catégories</option>
+            <option *ngFor="let cat of categories" [value]="cat.id">{{ cat.name }}</option>
+          </select>
+        </div>
+
+        <div class="filter-group">
+          <label class="form-label">Marque</label>
+          <select [(ngModel)]="filters.marque_id" (change)="onFilterChange()" class="form-control">
+            <option [ngValue]="undefined">Toutes les marques</option>
+            <option *ngFor="let marque of marques" [value]="marque.id">{{ marque.name }}</option>
+          </select>
+        </div>
+
+        <div class="filter-group">
+          <label class="form-label">Prix minimum</label>
+          <input type="number" [(ngModel)]="filters.min_price" (change)="onFilterChange()" class="form-control" placeholder="0">
+        </div>
+
+        <div class="filter-group">
+          <label class="form-label">Prix maximum</label>
+          <input type="number" [(ngModel)]="filters.max_price" (change)="onFilterChange()" class="form-control" placeholder="999999">
+        </div>
+
+        <div class="filter-group">
+          <label class="form-label">Trier par</label>
+          <select [(ngModel)]="filters.sort_by" (change)="onFilterChange()" class="form-control">
+            <option value="newest">Plus récents</option>
+            <option value="popular">Plus populaires</option>
+            <option value="price_asc">Prix croissant</option>
+            <option value="price_desc">Prix décroissant</option>
+          </select>
+        </div>
+
+        <div class="filter-group">
+          <button (click)="clearFilters()" class="btn btn-outline">Réinitialiser</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Loading -->
+    <div *ngIf="loading" class="loading-container">
+      <div class="spinner"></div>
+      <p>Chargement des produits...</p>
+    </div>
+
+    <!-- Products Grid -->
+    <div *ngIf="!loading && products.length > 0" class="products-grid">
+      <div *ngFor="let product of products" class="product-card">
+        <a [routerLink]="['/products', product.slug]" class="product-image">
+          <img [src]="product.images?.[0] || 'assets/images/placeholder.jpg'" [alt]="product.name">
+          <span *ngIf="product.is_featured" class="badge badge-primary featured-badge">Vedette</span>
+        </a>
+        <div class="product-info">
+          <h3><a [routerLink]="['/products', product.slug]">{{ product.name }}</a></h3>
+          <p class="product-description">{{ product.description?.substring(0, 80) }}...</p>
+          <div class="product-footer">
+            <div class="price-section">
+              <span class="price">{{ product.price | number:'1.0-0' }} FCFA</span>
+              <span *ngIf="product.compare_price" class="compare-price">{{ product.compare_price | number:'1.0-0' }} FCFA</span>
+            </div>
+            <button *ngIf="authService.isClient() || !authService.isAuthenticated()" 
+                    (click)="addToCart(product)" 
+                    class="btn btn-primary btn-sm">
+              Ajouter au panier
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- No Results -->
+    <div *ngIf="!loading && products.length === 0" class="no-results">
+      <p>Aucun produit trouvé</p>
+      <button (click)="clearFilters()" class="btn btn-primary">Voir tous les produits</button>
+    </div>
+
+    <!-- Pagination -->
+    <div *ngIf="!loading && products.length > 0" class="pagination">
+      <button 
+        (click)="onPageChange(pagination.current_page - 1)" 
+        [disabled]="pagination.current_page === 1"
+        class="btn btn-outline">
+        Précédent
+      </button>
+      
+      <span class="page-info">
+        Page {{ pagination.current_page }} sur {{ pagination.last_page }} ({{ pagination.total }} produits)
+      </span>
+      
+      <button 
+        (click)="onPageChange(pagination.current_page + 1)" 
+        [disabled]="pagination.current_page === pagination.last_page"
+        class="btn btn-outline">
+        Suivant
+      </button>
+    </div>
+  </div>
 </div>

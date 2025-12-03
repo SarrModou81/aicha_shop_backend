@@ -1,4 +1,50 @@
-<div class="container">
-  <h1>Products</h1>
-  <p>Page en construction...</p>
+<div class="vendeur-products-page">
+  <div class="container">
+    <div class="page-header">
+      <h1>Mes Produits</h1>
+      <button routerLink="/vendeur/products/add" class="btn btn-primary">Ajouter un produit</button>
+    </div>
+
+    <div *ngIf="loading" class="loading-container">
+      <div class="spinner"></div>
+    </div>
+
+    <div *ngIf="!loading && products.length === 0" class="empty-state">
+      <p>Aucun produit. Ajoutez votre premier produit!</p>
+    </div>
+
+    <div *ngIf="!loading && products.length > 0" class="products-table">
+      <table>
+        <thead>
+          <tr>
+            <th>Image</th>
+            <th>Nom</th>
+            <th>Prix</th>
+            <th>Stock</th>
+            <th>Statut</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let product of products">
+            <td><img [src]="product.images?.[0] || 'assets/placeholder.jpg'" class="product-thumb"></td>
+            <td>{{ product.name }}</td>
+            <td>{{ product.price | number:'1.0-0' }} FCFA</td>
+            <td>{{ product.stock?.quantity || 0 }}</td>
+            <td>
+              <span class="badge" [ngClass]="product.is_active ? 'badge-success' : 'badge-error'">
+                {{ product.is_active ? 'Actif' : 'Inactif' }}
+              </span>
+            </td>
+            <td>
+              <button (click)="toggleProductVisibility(product)" class="btn btn-sm btn-outline">
+                {{ product.is_active ? 'Désactiver' : 'Activer' }}
+              </button>
+              <button (click)="deleteProduct(product)" class="btn btn-sm btn-outline">Supprimer</button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
 </div>

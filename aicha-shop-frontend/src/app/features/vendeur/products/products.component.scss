@@ -1,0 +1,66 @@
+.vendeur-products-page {
+  padding: 2rem 0;
+}
+
+.page-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2rem;
+}
+
+.products-table {
+  background: white;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+
+    thead {
+      background: #F5F5F5;
+      
+      th {
+        padding: 1rem;
+        text-align: left;
+        font-weight: 600;
+        color: #212121;
+      }
+    }
+
+    tbody {
+      tr {
+        border-bottom: 1px solid #E0E0E0;
+
+        &:hover {
+          background: #F5F5F5;
+        }
+
+        td {
+          padding: 1rem;
+          vertical-align: middle;
+
+          .product-thumb {
+            width: 60px;
+            height: 60px;
+            object-fit: cover;
+            border-radius: 8px;
+          }
+
+          button {
+            margin-right: 0.5rem;
+          }
+        }
+      }
+    }
+  }
+}
+
+.empty-state {
+  text-align: center;
+  padding: 4rem 0;
+  background: white;
+  border-radius: 12px;
+}

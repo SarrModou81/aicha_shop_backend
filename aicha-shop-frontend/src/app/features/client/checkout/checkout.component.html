@@ -1,1 +1,144 @@
-<p>checkout works!</p>
+<div class="checkout-page">
+  <div class="container">
+    <h1 class="page-title">Finaliser la commande</h1>
+
+    <div *ngIf="loading" class="loading-container">
+      <div class="spinner"></div>
+      <p>Chargement...</p>
+    </div>
+
+    <div *ngIf="!loading" class="checkout-content">
+      <!-- Checkout Form -->
+      <div class="checkout-form">
+        <form [formGroup]="checkoutForm" (ngSubmit)="onSubmit()">
+          <div class="form-section">
+            <h2>Informations de livraison</h2>
+            
+            <div class="form-group">
+              <label class="form-label">Adresse de livraison *</label>
+              <input type="text" formControlName="shipping_address" class="form-control" 
+                     placeholder="Ex: Rue 10, Quartier Liberté">
+              <span class="form-error" *ngIf="checkoutForm.get('shipping_address')?.invalid && checkoutForm.get('shipping_address')?.touched">
+                L'adresse est obligatoire
+              </span>
+            </div>
+
+            <div class="form-row">
+              <div class="form-group">
+                <label class="form-label">Ville *</label>
+                <input type="text" formControlName="shipping_city" class="form-control" placeholder="Ex: Dakar">
+                <span class="form-error" *ngIf="checkoutForm.get('shipping_city')?.invalid && checkoutForm.get('shipping_city')?.touched">
+                  La ville est obligatoire
+                </span>
+              </div>
+
+              <div class="form-group">
+                <label class="form-label">Pays *</label>
+                <input type="text" formControlName="shipping_country" class="form-control">
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">Téléphone *</label>
+              <input type="tel" formControlName="shipping_phone" class="form-control" 
+                     placeholder="Ex: 771234567">
+              <span class="form-error" *ngIf="checkoutForm.get('shipping_phone')?.invalid && checkoutForm.get('shipping_phone')?.touched">
+                Numéro de téléphone invalide
+              </span>
+            </div>
+          </div>
+
+          <div class="form-section">
+            <h2>Mode de paiement</h2>
+            
+            <div class="payment-methods">
+              <label class="payment-option">
+                <input type="radio" formControlName="payment_method" value="espece">
+                <div class="payment-card">
+                  <strong>Paiement à la livraison</strong>
+                  <p>Payez en espèces lors de la réception</p>
+                </div>
+              </label>
+
+              <label class="payment-option">
+                <input type="radio" formControlName="payment_method" value="wave">
+                <div class="payment-card">
+                  <strong>Wave</strong>
+                  <p>Paiement mobile sécurisé</p>
+                </div>
+              </label>
+
+              <label class="payment-option">
+                <input type="radio" formControlName="payment_method" value="orange_money">
+                <div class="payment-card">
+                  <strong>Orange Money</strong>
+                  <p>Paiement mobile Orange</p>
+                </div>
+              </label>
+
+              <label class="payment-option">
+                <input type="radio" formControlName="payment_method" value="free_money">
+                <div class="payment-card">
+                  <strong>Free Money</strong>
+                  <p>Paiement mobile Free</p>
+                </div>
+              </label>
+
+              <label class="payment-option">
+                <input type="radio" formControlName="payment_method" value="carte">
+                <div class="payment-card">
+                  <strong>Carte bancaire</strong>
+                  <p>Visa, Mastercard</p>
+                </div>
+              </label>
+            </div>
+          </div>
+
+          <div class="form-section">
+            <h2>Notes (optionnel)</h2>
+            <div class="form-group">
+              <textarea formControlName="notes" class="form-control" rows="4"
+                        placeholder="Instructions spéciales pour la livraison..."></textarea>
+            </div>
+          </div>
+
+          <button type="submit" [disabled]="checkoutForm.invalid || submitting" 
+                  class="btn btn-primary btn-block btn-lg">
+            {{ submitting ? 'Traitement...' : 'Confirmer la commande' }}
+          </button>
+        </form>
+      </div>
+
+      <!-- Order Summary -->
+      <div class="order-summary">
+        <h2>Récapitulatif</h2>
+        
+        <div class="summary-items">
+          <div *ngFor="let item of cartItems" class="summary-item">
+            <img [src]="item.produit?.images?.[0] || 'assets/images/placeholder.jpg'" [alt]="item.produit?.name">
+            <div class="item-info">
+              <h4>{{ item.produit?.name }}</h4>
+              <p>Qté: {{ item.quantity }} × {{ item.price | number:'1.0-0' }} FCFA</p>
+            </div>
+            <span class="item-total">{{ item.price * item.quantity | number:'1.0-0' }} FCFA</span>
+          </div>
+        </div>
+
+        <div class="summary-totals">
+          <div class="summary-line">
+            <span>Sous-total</span>
+            <span>{{ total | number:'1.0-0' }} FCFA</span>
+          </div>
+          <div class="summary-line">
+            <span>Livraison</span>
+            <span>Gratuite</span>
+          </div>
+          <div class="summary-total">
+            <span>Total</span>
+            <span>{{ total | number:'1.0-0' }} FCFA</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

@@ -1,4 +1,38 @@
-<div class="container">
-  <h1>Tableau de Bord Admin</h1>
-  <p>Bienvenue sur votre tableau de bord</p>
+<div class="admin-dashboard">
+  <div class="container">
+    <h1 class="page-title">Tableau de Bord Administrateur</h1>
+    
+    <div *ngIf="loading" class="loading-container">
+      <div class="spinner"></div>
+    </div>
+
+    <div *ngIf="!loading && stats" class="dashboard-grid">
+      <div class="stat-card">
+        <h3>Total Utilisateurs</h3>
+        <p class="stat-value">{{ stats?.total_users || 0 }}</p>
+      </div>
+      <div class="stat-card">
+        <h3>Total Produits</h3>
+        <p class="stat-value">{{ stats?.total_products || 0 }}</p>
+      </div>
+      <div class="stat-card">
+        <h3>Total Commandes</h3>
+        <p class="stat-value">{{ stats?.total_orders || 0 }}</p>
+      </div>
+      <div class="stat-card">
+        <h3>Chiffre d'Affaires</h3>
+        <p class="stat-value">{{ stats?.total_revenue | number:'1.0-0' }} FCFA</p>
+      </div>
+    </div>
+
+    <div class="quick-links">
+      <h2>Gestion</h2>
+      <div class="links-grid">
+        <a routerLink="/admin/users" class="link-card">Gérer les Utilisateurs</a>
+        <a routerLink="/admin/products" class="link-card">Gérer les Produits</a>
+        <a routerLink="/admin/orders" class="link-card">Gérer les Commandes</a>
+        <a routerLink="/admin/settings" class="link-card">Paramètres</a>
+      </div>
+    </div>
+  </div>
 </div>
