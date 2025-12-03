@@ -1,0 +1,10 @@
+<div class="product-card" *ngIf="product">
+  <div class="product-image">
+    <img [src]="product.images?.[0] || 'assets/images/placeholder.jpg'" [alt]="product.name">
+  </div>
+  <div class="product-info">
+    <h3>{{ product.name }}</h3>
+    <p class="price">{{ product.price }} FCFA</p>
+    <a [routerLink]="['/products', product.slug]" class="btn btn-primary btn-sm">Voir détails</a>
+  </div>
+</div>

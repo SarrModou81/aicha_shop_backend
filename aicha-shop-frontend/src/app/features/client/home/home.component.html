@@ -1,0 +1,19 @@
+<div class="home">
+  <section class="hero">
+    <div class="container">
+      <h1>Bienvenue sur AICHA SHOP</h1>
+      <p>Découvrez nos produits de qualité</p>
+      <a routerLink="/products" class="btn btn-primary btn-lg">Voir les produits</a>
+    </div>
+  </section>
+
+  <section class="featured">
+    <div class="container">
+      <h2>Produits en vedette</h2>
+      <div class="loading" *ngIf="loading">Chargement...</div>
+      <div class="products-grid">
+        <app-product-card *ngFor="let product of featuredProducts" [product]="product"></app-product-card>
+      </div>
+    </div>
+  </section>
+</div>

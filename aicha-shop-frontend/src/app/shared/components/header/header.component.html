@@ -1,0 +1,42 @@
+<header class="header">
+  <div class="container">
+    <div class="header-content">
+      <div class="logo">
+        <a routerLink="/">
+          <h1>AICHA <span>SHOP</span></h1>
+        </a>
+      </div>
+
+      <nav class="nav" *ngIf="!authService.isAuthenticated()">
+        <a routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}">Accueil</a>
+        <a routerLink="/products">Produits</a>
+        <a routerLink="/auth/login" class="btn btn-outline btn-sm">Connexion</a>
+        <a routerLink="/auth/register" class="btn btn-primary btn-sm">Inscription</a>
+      </nav>
+
+      <nav class="nav" *ngIf="authService.isClient()">
+        <a routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}">Accueil</a>
+        <a routerLink="/products">Produits</a>
+        <a routerLink="/orders">Mes Commandes</a>
+        <a routerLink="/cart" class="cart-link">
+          Panier <span *ngIf="(cartCount$ | async)?.count > 0">({{ (cartCount$ | async)?.count }})</span>
+        </a>
+        <button (click)="logout()" class="btn btn-outline btn-sm">Déconnexion</button>
+      </nav>
+
+      <nav class="nav" *ngIf="authService.isVendeur()">
+        <a routerLink="/vendeur/dashboard">Dashboard</a>
+        <a routerLink="/vendeur/products">Produits</a>
+        <a routerLink="/vendeur/orders">Commandes</a>
+        <button (click)="logout()" class="btn btn-outline btn-sm">Déconnexion</button>
+      </nav>
+
+      <nav class="nav" *ngIf="authService.isAdmin()">
+        <a routerLink="/admin/dashboard">Dashboard</a>
+        <a routerLink="/admin/users">Utilisateurs</a>
+        <a routerLink="/admin/products">Produits</a>
+        <button (click)="logout()" class="btn btn-outline btn-sm">Déconnexion</button>
+      </nav>
+    </div>
+  </div>
+</header>
