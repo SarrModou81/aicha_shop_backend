@@ -73,7 +73,7 @@ export class ProductsComponent implements OnInit {
       category_id: product.category_id?.toString() || '',
       marque_id: product.marque_id?.toString() || '',
       quantity: product.stock?.quantity || 0,
-      low_stock_threshold: product.stock?.low_stock_threshold || 10,
+      low_stock_threshold: 10,
       is_featured: product.is_featured || false
     };
     this.showForm = true;
@@ -83,31 +83,40 @@ export class ProductsComponent implements OnInit {
   saveProduct(form: NgForm): void {
     if (!form.valid) return;
 
-    const productData = {
-      ...this.formData,
-      category_id: parseInt(this.formData.category_id),
-      marque_id: parseInt(this.formData.marque_id)
-    };
+    // Créer FormData pour l'envoi
+    const formData = new FormData();
+    formData.append('name', this.formData.name);
+    formData.append('description', this.formData.description);
+    formData.append('price', this.formData.price.toString());
+    formData.append('category_id', this.formData.category_id);
+    formData.append('marque_id', this.formData.marque_id);
+    formData.append('quantity', this.formData.quantity.toString());
+    formData.append('low_stock_threshold', this.formData.low_stock_threshold.toString());
+    formData.append('is_featured', this.formData.is_featured ? '1' : '0');
+
+    if (this.formData.compare_price) {
+      formData.append('compare_price', this.formData.compare_price.toString());
+    }
 
     if (this.editingProduct) {
       // Update existing product
-      this.vendeurService.updateProduct(this.editingProduct.id, productData).subscribe({
+      this.vendeurService.updateProduct(this.editingProduct.id, formData).subscribe({
         next: () => {
           alert('Produit mis à jour avec succès');
           this.loadProducts();
           this.cancelForm();
         },
-        error: (err) => alert('Erreur: ' + (err.error?.message || 'Une erreur est survenue'))
+        error: (err: any) => alert('Erreur: ' + (err.error?.message || 'Une erreur est survenue'))
       });
     } else {
       // Create new product
-      this.vendeurService.createProduct(productData).subscribe({
+      this.vendeurService.addProduct(formData).subscribe({
         next: () => {
           alert('Produit créé avec succès');
           this.loadProducts();
           this.cancelForm();
         },
-        error: (err) => alert('Erreur: ' + (err.error?.message || 'Une erreur est survenue'))
+        error: (err: any) => alert('Erreur: ' + (err.error?.message || 'Une erreur est survenue'))
       });
     }
   }
@@ -134,7 +143,7 @@ export class ProductsComponent implements OnInit {
         product.is_active = !product.is_active;
         alert('Statut modifié avec succès');
       },
-      error: (err) => alert('Erreur: ' + (err.error?.message || 'Une erreur est survenue'))
+      error: (err: any) => alert('Erreur: ' + (err.error?.message || 'Une erreur est survenue'))
     });
   }
 
@@ -146,7 +155,7 @@ export class ProductsComponent implements OnInit {
         this.products = this.products.filter(p => p.id !== product.id);
         alert('Produit supprimé avec succès');
       },
-      error: (err) => alert('Erreur: ' + (err.error?.message || 'Une erreur est survenue'))
+      error: (err: any) => alert('Erreur: ' + (err.error?.message || 'Une erreur est survenue'))
     });
   }
 }

@@ -111,11 +111,10 @@
           </td>
           <td>
             <div class="product-name">{{ product.name }}</div>
-            <div class="product-ref" *ngIf="product.reference">Réf: {{ product.reference }}</div>
           </td>
           <td class="price-cell">{{ product.price | number:'1.0-0' }} FCFA</td>
           <td>
-            <span class="stock-badge" [ngClass]="{'low-stock': product.stock?.quantity <= (product.stock?.low_stock_threshold || 10)}">
+            <span class="stock-badge" [ngClass]="{'low-stock': (product.stock?.quantity || 0) <= 10}">
               {{ product.stock?.quantity || 0 }}
             </span>
           </td>
