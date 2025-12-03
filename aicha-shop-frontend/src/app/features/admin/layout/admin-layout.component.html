@@ -1,0 +1,59 @@
+<div class="admin-layout" [class.sidebar-closed]="!sidebarOpen">
+  <!-- Sidebar -->
+  <aside class="sidebar">
+    <div class="sidebar-header">
+      <div class="logo">
+        <h2>AICHA SHOP</h2>
+        <span class="role-badge">Admin</span>
+      </div>
+    </div>
+
+    <nav class="sidebar-menu">
+      <a *ngFor="let item of menuItems" 
+         [routerLink]="item.route" 
+         routerLinkActive="active"
+         class="menu-item">
+        <span class="menu-icon">{{ item.icon }}</span>
+        <span class="menu-label">{{ item.label }}</span>
+      </a>
+    </nav>
+
+    <div class="sidebar-footer">
+      <div class="user-info">
+        <div class="user-avatar">{{ currentUser?.name?.charAt(0) || 'A' }}</div>
+        <div class="user-details">
+          <p class="user-name">{{ currentUser?.name }}</p>
+          <p class="user-email">{{ currentUser?.email }}</p>
+        </div>
+      </div>
+    </div>
+  </aside>
+
+  <!-- Main Content -->
+  <div class="main-content">
+    <!-- Top Navbar -->
+    <header class="top-navbar">
+      <button class="toggle-btn" (click)="toggleSidebar()">
+        <span class="hamburger"></span>
+      </button>
+
+      <div class="navbar-title">
+        <h1>Administration</h1>
+      </div>
+
+      <div class="navbar-actions">
+        <button class="btn-icon" title="Notifications">
+          <span>🔔</span>
+        </button>
+        <button (click)="logout()" class="btn btn-outline btn-sm">
+          Déconnexion
+        </button>
+      </div>
+    </header>
+
+    <!-- Page Content -->
+    <div class="page-content">
+      <router-outlet></router-outlet>
+    </div>
+  </div>
+</div>

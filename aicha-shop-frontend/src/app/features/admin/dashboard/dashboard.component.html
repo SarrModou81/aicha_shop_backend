@@ -1,37 +1,78 @@
 <div class="admin-dashboard">
-  <div class="container">
-    <h1 class="page-title">Tableau de Bord Administrateur</h1>
-    
-    <div *ngIf="loading" class="loading-container">
-      <div class="spinner"></div>
+  <h1 class="page-title">Tableau de Bord Administrateur</h1>
+
+  <div *ngIf="loading" class="loading-container">
+    <div class="spinner"></div>
+    <p>Chargement...</p>
+  </div>
+
+  <div *ngIf="!loading && stats" class="dashboard-content">
+    <!-- Stats Cards -->
+    <div class="stats-grid">
+      <div class="stat-card primary">
+        <div class="stat-icon">👥</div>
+        <div class="stat-info">
+          <h3>Total Utilisateurs</h3>
+          <p class="stat-value">{{ stats?.total_users || 0 }}</p>
+          <span class="stat-detail">Tous les comptes</span>
+        </div>
+      </div>
+
+      <div class="stat-card success">
+        <div class="stat-icon">📦</div>
+        <div class="stat-info">
+          <h3>Total Produits</h3>
+          <p class="stat-value">{{ stats?.total_products || 0 }}</p>
+          <span class="stat-detail">Dans le catalogue</span>
+        </div>
+      </div>
+
+      <div class="stat-card warning">
+        <div class="stat-icon">🛍️</div>
+        <div class="stat-info">
+          <h3>Total Commandes</h3>
+          <p class="stat-value">{{ stats?.total_orders || 0 }}</p>
+          <span class="stat-detail">Toutes les commandes</span>
+        </div>
+      </div>
+
+      <div class="stat-card info">
+        <div class="stat-icon">💰</div>
+        <div class="stat-info">
+          <h3>Chiffre d'Affaires</h3>
+          <p class="stat-value">{{ stats?.total_revenue | number:'1.0-0' }} FCFA</p>
+          <span class="stat-detail">Total des ventes</span>
+        </div>
+      </div>
     </div>
 
-    <div *ngIf="!loading && stats" class="dashboard-grid">
-      <div class="stat-card">
-        <h3>Total Utilisateurs</h3>
-        <p class="stat-value">{{ stats?.total_users || 0 }}</p>
-      </div>
-      <div class="stat-card">
-        <h3>Total Produits</h3>
-        <p class="stat-value">{{ stats?.total_products || 0 }}</p>
-      </div>
-      <div class="stat-card">
-        <h3>Total Commandes</h3>
-        <p class="stat-value">{{ stats?.total_orders || 0 }}</p>
-      </div>
-      <div class="stat-card">
-        <h3>Chiffre d'Affaires</h3>
-        <p class="stat-value">{{ stats?.total_revenue | number:'1.0-0' }} FCFA</p>
-      </div>
-    </div>
+    <!-- Quick Actions -->
+    <div class="quick-actions">
+      <h2>Gestion Rapide</h2>
+      <div class="actions-grid">
+        <a routerLink="/admin/users" class="action-card">
+          <div class="action-icon">👥</div>
+          <h3>Gérer les Utilisateurs</h3>
+          <p>Activer, désactiver et modérer les utilisateurs</p>
+        </a>
 
-    <div class="quick-links">
-      <h2>Gestion</h2>
-      <div class="links-grid">
-        <a routerLink="/admin/users" class="link-card">Gérer les Utilisateurs</a>
-        <a routerLink="/admin/products" class="link-card">Gérer les Produits</a>
-        <a routerLink="/admin/orders" class="link-card">Gérer les Commandes</a>
-        <a routerLink="/admin/settings" class="link-card">Paramètres</a>
+        <a routerLink="/admin/products" class="action-card">
+          <div class="action-icon">📦</div>
+          <h3>Gérer les Produits</h3>
+          <p>Modérer et gérer le catalogue</p>
+        </a>
+
+        <a routerLink="/admin/orders" class="action-card">
+          <div class="action-icon">🛍️</div>
+          <h3>Gérer les Commandes</h3>
+          <p>Suivre toutes les commandes</p>
+        </a>
+
+        <a routerLink="/admin/settings" class="action-card">
+          <div class="action-icon">⚙️</div>
+          <h3>Paramètres</h3>
+          <p>Configuration système</p>
+        </a>
       </div>
     </div>
   </div>

@@ -1,18 +1,71 @@
 <div class="home">
+  <!-- Hero Section -->
   <section class="hero">
+    <div class="hero-overlay"></div>
     <div class="container">
-      <h1>Bienvenue sur AICHA SHOP</h1>
-      <p>Découvrez nos produits de qualité</p>
-      <a routerLink="/products" class="btn btn-primary btn-lg">Voir les produits</a>
+      <div class="hero-content">
+        <h1 class="hero-title">Bienvenue sur AICHA SHOP</h1>
+        <p class="hero-subtitle">Découvrez notre sélection exclusive de produits de qualité supérieure</p>
+        <div class="hero-buttons">
+          <a routerLink="/products" class="btn btn-hero btn-primary">
+            <span>Découvrir nos produits</span>
+            <span class="icon">→</span>
+          </a>
+          <a *ngIf="!authService.isAuthenticated()" routerLink="/auth/register" class="btn btn-hero btn-outline">
+            <span>Créer un compte</span>
+          </a>
+        </div>
+      </div>
     </div>
   </section>
 
+  <!-- Features Section -->
+  <section class="features">
+    <div class="container">
+      <div class="features-grid">
+        <div class="feature-card">
+          <div class="feature-icon">🚚</div>
+          <h3>Livraison Rapide</h3>
+          <p>Recevez vos commandes en 24-48h</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon">✅</div>
+          <h3>Qualité Garantie</h3>
+          <p>Produits authentiques et certifiés</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon">💳</div>
+          <h3>Paiement Sécurisé</h3>
+          <p>Transactions 100% sécurisées</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon">💬</div>
+          <h3>Support 24/7</h3>
+          <p>Assistance client disponible</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Featured Products -->
   <section class="featured">
     <div class="container">
-      <h2>Produits en vedette</h2>
-      <div class="loading" *ngIf="loading">Chargement...</div>
-      <div class="products-grid">
+      <div class="section-header">
+        <h2>Produits en vedette</h2>
+        <p>Notre sélection des meilleurs produits du moment</p>
+      </div>
+
+      <div *ngIf="loading" class="loading-container">
+        <div class="spinner"></div>
+        <p>Chargement des produits...</p>
+      </div>
+
+      <div *ngIf="!loading" class="products-grid">
         <app-product-card *ngFor="let product of featuredProducts" [product]="product"></app-product-card>
+      </div>
+
+      <div *ngIf="!loading && featuredProducts.length > 0" class="text-center mt-4">
+        <a routerLink="/products" class="btn btn-outline-primary btn-lg">Voir tous les produits</a>
       </div>
     </div>
   </section>

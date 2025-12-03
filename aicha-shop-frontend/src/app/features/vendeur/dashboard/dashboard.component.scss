@@ -1,12 +1,11 @@
 .dashboard-page {
-  padding: 2rem 0;
-  min-height: calc(100vh - 200px);
+  padding: 2rem;
 }
 
 .page-title {
-  text-align: center;
   margin-bottom: 2rem;
   color: #212121;
+  font-size: 1.75rem;
 }
 
 .loading-container {
@@ -28,18 +27,22 @@
 .stat-card {
   background: white;
   padding: 2rem;
-  border-radius: 12px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  border-radius: 16px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
   display: flex;
   gap: 1.5rem;
-  transition: transform 0.2s;
+  transition: all 0.3s ease;
 
   &:hover {
     transform: translateY(-5px);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12);
   }
 
   .stat-icon {
     font-size: 3rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
   }
 
   .stat-info {
@@ -50,6 +53,7 @@
       color: #757575;
       margin-bottom: 0.5rem;
       text-transform: uppercase;
+      letter-spacing: 0.5px;
     }
 
     .stat-value {
@@ -90,35 +94,44 @@
   h2 {
     margin-bottom: 1.5rem;
     color: #212121;
+    font-size: 1.5rem;
   }
 
   .actions-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
     gap: 1.5rem;
   }
 
   .action-card {
     background: white;
     padding: 2rem;
-    border-radius: 12px;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    border-radius: 16px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
     text-align: center;
-    transition: all 0.2s;
+    transition: all 0.3s ease;
     cursor: pointer;
+    border: 2px solid transparent;
 
     &:hover {
       transform: translateY(-5px);
-      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12);
+      border-color: #E91E63;
     }
 
     .action-icon {
       font-size: 3rem;
       margin-bottom: 1rem;
+      filter: grayscale(30%);
+      transition: filter 0.3s;
+    }
+
+    &:hover .action-icon {
+      filter: grayscale(0%);
     }
 
     h3 {
-      font-size: 1.25rem;
+      font-size: 1.15rem;
       margin-bottom: 0.5rem;
       color: #212121;
     }
@@ -126,6 +139,7 @@
     p {
       color: #757575;
       margin: 0;
+      font-size: 0.9rem;
     }
   }
 }
